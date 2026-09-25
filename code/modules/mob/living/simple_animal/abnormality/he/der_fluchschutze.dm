@@ -1,5 +1,5 @@
 // Der Fluchshutze, implemnted by neadsy_ - Sprites by Cringelord
-/mob/living/simple_animal/hostile/abnormality/Der_Fluchschutze
+/mob/living/simple_animal/hostile/abnormality/der_fluchschutze
 	name = "Der Fluchschütze"
 	desc = "A tall man adorned in some sort of military uniform, they loom over you, holding their large shotgun."
 	icon = 'ModularLobotomy/_Lobotomyicons/32x64.dmi'
@@ -9,8 +9,10 @@
 	maxHealth = 1000
 	health = 1000
 	ranged = TRUE
-	minimum_distance = 5
+	minimum_distance = 1
 	retreat_distance = 2
+	attack_sound = 'sound/weapons/black_silence/shotgun.ogg'
+	ranged_cooldown_time = 4 SECONDS
 	move_to_delay = 5
 	can_breach = TRUE
 	damage_coeff = list(RED_DAMAGE = 0.7, WHITE_DAMAGE = 1.2, BLACK_DAMAGE = 0.7, PALE_DAMAGE = 0.7, FIRE = 0.5)
@@ -29,6 +31,7 @@
 		ABNORMALITY_WORK_ATTACHMENT = 60,
 		ABNORMALITY_WORK_REPRESSION = 50,
 	)
+	max_boxes = 16
 	work_damage_amount = 8
 	work_damage_type = RED_DAMAGE
 	chem_type = /datum/reagent/abnormality/sin/wrath
@@ -51,5 +54,9 @@
 	)
 
 
+/mob/living/simple_animal/hostile/abnormality/der_fluchschutze/OpenFire()
+	if(get_dist(src, target) > 3)
 
-
+	var/ammo = 2
+	var/max_ammo = 2
+	var/reload_time = 2 SECONDS

@@ -73,3 +73,5 @@
 	category = CITY_FACTION_MINOR
 	leader_job = /datum/job/devyatdir
 	requires_leader = TRUE
+
+// Singlet Roles (CITY_FACTION_SINGLET)

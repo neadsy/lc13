@@ -8,7 +8,7 @@
 #define JOB_NOT_TRUSTED 8
 #define JOB_NOT_MENTOR 9
 
-//City factions. ALWAYS is always enabled, MAJOR and MINOR are drawn for each round.
+//City factions. ALWAYS is always enabled, MAJOR, MINOR & SINGLET are drawn for each round.
 #define CITY_FACTION_ALWAYS "always"
 #define CITY_FACTION_MAJOR "major"
 #define CITY_FACTION_MINOR "minor"

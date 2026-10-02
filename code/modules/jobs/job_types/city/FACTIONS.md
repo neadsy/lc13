@@ -14,6 +14,7 @@ Three major and five minor factions are drawn at random each round
 	  clinic/          always active, never drawn
 	  major_factions/  one folder per faction
 	  minor_factions/  one folder per faction
+	  singlets/		   one file per singlet
 	  old_jobs/        disabled, pending rework
 
 ## 1. Write the jobs

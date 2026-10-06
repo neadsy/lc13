@@ -1,5 +1,7 @@
 /mob/living/simple_animal/hostile/limbus_abno/KQE
+// hi this is mostly ported from RCA, his gimmick works fine for LCL and its better to have more abnos in the game.
 	true_name = "KQE-1J-23"
+	original_abno = /mob/living/simple_animal/hostile/limbus_abno/KQE
 	maxHealth = 1450
 	health = 150
 	rapid_melee = 2
@@ -16,14 +18,40 @@
 	damage_coeff = list(RED_DAMAGE = 1.5, WHITE_DAMAGE = 0.8, BLACK_DAMAGE = 1, PALE_DAMAGE = 1.2)
 	ranged = TRUE
 
+	var/grab_cooldown
+	var/grab_cooldown_time = 15 SECONDS
+	var/grab_damage = 120
+	var/heart = FALSE
+	var/heart_threshold = 700
+
+
+	hunger_cooldown_time = 2 MINUTES
+	diet_value = 50
+	desire_loss = 5
+	desire_on_pet = 5
+	desire_on_talk = 3
+	desire_on_eat = 10
+	rep_desire_gain = -5
+	insight_cooldown_time = 1 MINUTES
+	liked_objects_list = list(/obj/item/modular_computer/tablet,)
+	diet_list = list(/obj/item/stock_parts/cell, obj/item/stack/cable_coil)
+	liked_objects_value = 5
+	hated_objects_list = list(/obj/effect/decal/cleanable) // Doesnt like dirty things, tour guide or whatever
+	hated_objects_value = 0.2
+
 	ego_list = list(
 		/datum/ego_datum/weapon/replica,
 		/datum/ego_datum/armor/replica,
 	)
 
 attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_grab_toggle)
-	original_abno = /mob/living/simple_animal/hostile/limbus_abno/KQE
-	abno_additional_instructions = ""
+
+
+	abno_additional_instructions = "You are a robotic tour guide, you exist to show visitors around the 'town' either willingly, or if they ignore you by force. \
+		you like the area to be clean and ordely, and love talking to visitors. you like instinct and insight, and eat batteries and wiring. \
+		<b>|Initiating Town Tour|: Your melee attack is entirely replaced with a 5x5 choreographed AoE centered around yourself.<br>\
+		<b>|Transfer Reg|: Your special ability allows you to target a tile for Transfer Reg causing a short stun and temporary debuffs.<br>\
+		<b>|Heart of the Town|: When your health falls below 50% your resistances will be greatly increased however you will also enter a staggered state for 10 seconds"
 
 /mob/living/simple_animal/hostile/limbus_abno/KQE/examine(mob/user)
 	. = ..()
@@ -35,6 +63,7 @@ attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_
 /datum/action/innate/limbus_action_toggle/toggle/kqe_grab_toggle
 	name = "Toggle Claw Attack"
 	button_icon_state = "kqe_toggle0"
+	desire_req = 50
 	chosen_attack_num = 2
 	chosen_message = span_colossus("You won't grab visitors anymore.")
 	button_icon_toggle_activated = "kqe_toggle1"
@@ -43,7 +72,7 @@ attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_
 	button_icon_toggle_deactivated = "kqe_toggle0"
 
 /*** Basic Procs ***/
-/mob/living/simple_animal/hostile/limbus_abno/KQEMove()
+/mob/living/simple_animal/hostile/limbus_abno/KQE/Move()
 	if(!can_act)
 		return FALSE
 	return ..()
@@ -62,8 +91,8 @@ attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_
 		revive(full_heal = TRUE, admin_revive = FALSE)//fully heal and spawn a heart
 		say("Please cooperate! Please Cooperrr... Csdk..ppra...@#@%!%^#$")
 		heart = TRUE
-		ChangeResistances(list(RED_DAMAGE = 0.4, WHITE_DAMAGE = 0.3, BLACK_DAMAGE = 0.3, PALE_DAMAGE = 0.3)) //KQE is often regarded as weak and easily dodged so he is being given this buff as a freebie
-		Stagger() //The fact KQE gets stunned for 10 seconds infront of RCorp I believe justifies this
+		ChangeResistances(list(RED_DAMAGE = 0.5, WHITE_DAMAGE = 0.5, BLACK_DAMAGE = 0.5, PALE_DAMAGE = 0.5))
+		Stagger()
 		manual_emote("blares random letters on its terminal before turning it off.")
 
 /mob/living/simple_animal/hostile/limbus_abno/KQE/death()
@@ -132,7 +161,7 @@ attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_
 	SLEEP_CHECK_DEATH(grab_delay)
 	icon_state = "kqe_grab"
 	new /obj/effect/LCL_KQE_Claw(get_turf(target))
-	SLEEP_CHECK_DEATH(5 SECONDS)
+	SLEEP_CHECK_DEATH(3 SECONDS)
 	icon_state = icon_living
 	can_act = TRUE
 
@@ -147,18 +176,19 @@ attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_
 	pull_force = INFINITY
 	generic_canpass = FALSE
 	movement_type = PHASING | FLYING
-	var/boom_damage = 50
+	var/boom_damage = 35
 	var/grabbed
 	layer = POINT_LAYER//Sprite should always be visible
 
 /obj/effect/LCL_KQE_Claw/Initialize()
 	. = ..()
-	addtimer(CALLBACK(src, PROC_REF(GrabAttack)), 3 SECONDS)
+	addtimer(CALLBACK(src, PROC_REF(GrabAttack)), 2 SECONDS)
 
 /obj/effect/LCL_KQE_Claw/proc/GrabAttack()
 	playsound(get_turf(src), 'sound/abnormalities/kqe/load2.ogg', 75, 0, 3)
 	new /obj/effect/temp_visual/approaching_claw(get_turf(src))
 	alpha = 1
+	for(var/mob/living/carbon/human/H in view(1, src))
 		grabbed = TRUE
 		H.deal_damage(boom_damage, BLACK_DAMAGE, src, flags = (DAMAGE_FORCED), attack_type = (ATTACK_TYPE_SPECIAL))
 		H.forceMove(get_turf(src))//pulls them all to the target
@@ -169,8 +199,10 @@ attack_action_types = list(/datum/action/innate/limbus_action_toggle/toggle/kqe_
 
 /obj/effect/LCL_KQE_Claw/proc/GrabStun(mob/living/carbon/human/target)
 	animate(target, pixel_x = 0, pixel_z = 12, time = 5)
-	target.Stun(6 SECONDS)
-	addtimer(CALLBACK(src, PROC_REF(AnimateBack),target), 6 SECONDS)
+	target.Stun(3 SECONDS)
+	target.apply_lc_black_fragile(5)
+	target.apply_lc_feeble(5)
+	addtimer(CALLBACK(src, PROC_REF(AnimateBack),target), 3 SECONDS)
 
 /obj/effect/LCL_KQE_Claw/proc/AnimateBack(mob/living/carbon/human/target)
 	animate(target, pixel_x = 0, pixel_z = 0, time = 1 SECONDS)

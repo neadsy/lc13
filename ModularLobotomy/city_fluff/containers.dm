@@ -185,6 +185,11 @@
 	desc = "Reclaimed, repainted, and marked with a red eye."
 	icon_state = "insurgence"
 
+/obj/structure/shipping_container/lce
+	name = "Limbus Company Extraction shipping container"
+	desc = "The crate is unusually scratched for how new it is..."
+	icon_state = "lce"
+
 // ------------------------------------------------------ unmarked stock
 /obj/structure/shipping_container/plain/rust
 	name = "rusted shipping container"

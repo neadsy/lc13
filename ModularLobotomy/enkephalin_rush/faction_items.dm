@@ -86,7 +86,7 @@
 
 /obj/item/stat_equalizer/mining/update_stats(mob/living/carbon/human/user)//TODO: make subtypes of this for specific corporations with stat specializations. Stuff like +20% temperance for Lobco or +20% fort (mining speed) for X corp.
 	var/list/attribute_list = list(FORTITUDE_ATTRIBUTE, PRUDENCE_ATTRIBUTE, TEMPERANCE_ATTRIBUTE, JUSTICE_ATTRIBUTE)
-	var/set_attribute = 20
+	var/set_attribute = 40
 	var/facility_full_percentage = 0
 	var/repaired_machines = GLOB.lobotomy_repairs
 	var/total_machines = GLOB.lobotomy_damages
@@ -94,18 +94,17 @@
 		facility_full_percentage = 100 * (repaired_machines / total_machines)
 	// % of machines repaired
 	switch(facility_full_percentage)
-		if(5 to 19)
+		if(20 to 39)
 			set_attribute *= 1.5
-		if(19 to 34)
+		if(40 to 49)
 			set_attribute *= 2
-		if(34 to 49)
+		if(50 to 59)
 			set_attribute *= 2.5
-		if(49 to 59)
+		if(60 to 99)
 			set_attribute *= 3
-		if(59 to 69)
-			set_attribute *= 3.5
-		if(69 to 100)
-			set_attribute *= 4
+		if(100)
+			set_attribute = 125
+
 	set_attribute += GetFacilityUpgradeValue(UPGRADE_AGENT_STATS)
 	for(var/A in attribute_list)
 		var/processing = get_raw_level(user, A)
